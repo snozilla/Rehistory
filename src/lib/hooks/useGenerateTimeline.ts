@@ -123,7 +123,12 @@ export function useGenerateTimeline() {
           if (text.includes("__ERROR__")) {
             throw new Error(text.split("__ERROR__").pop() || "Stream error");
           }
-          data = JSON.parse(repairJson(text)) as PartialTimeline;
+          // Strip markdown fencing if present
+          let cleaned = text.trim();
+          if (cleaned.startsWith("```")) {
+            cleaned = cleaned.replace(/^```(?:json)?\s*/, "").replace(/\s*```$/, "");
+          }
+          data = JSON.parse(repairJson(cleaned)) as PartialTimeline;
         } else {
           data = (await response.json()) as PartialTimeline;
         }

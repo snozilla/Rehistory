@@ -32,14 +32,39 @@ export async function POST(req: Request) {
   }
 }
 
+const JSON_SYSTEM = `${getSystemPrompt()}
+
+IMPORTANT: Respond ONLY with valid JSON matching this exact structure (no markdown, no explanation):
+{
+  "divergenceYear": <number>,
+  "divergenceDescription": "<string>",
+  "events": [
+    {
+      "id": "evt_1",
+      "year": <number>,
+      "title": "<string>",
+      "description": "<1-2 sentences>",
+      "category": "<Politics|Technology|Culture|Economy|Military|Science|Society>",
+      "significance": <1-5>,
+      "causedBy": ["<event ids>"],
+      "realWorldCounterpart": "<string or null>"
+    }
+  ],
+  "connections": [
+    { "sourceId": "<id>", "targetId": "<id>", "relationship": "<string>" }
+  ],
+  "realHistoryEvents": [
+    <same structure as events, with ids like "real_1">
+  ]
+}
+
+Be concise. Keep descriptions to 1 sentence. Generate exactly 8 alt events, 5 real events, and 8 connections.`;
+
 async function handleAnthropicStreaming(
   premise: string,
   apiKey: string,
   model?: string
 ) {
-  const fullSchema = generatedTimelineSchema.toJSONSchema();
-  const { $schema, ...jsonSchema } = fullSchema as Record<string, unknown>;
-
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -51,17 +76,8 @@ async function handleAnthropicStreaming(
       model: model || "claude-sonnet-4-5-20250929",
       max_tokens: 8192,
       stream: true,
-      system: getSystemPrompt(),
+      system: JSON_SYSTEM,
       messages: [{ role: "user", content: getUserPrompt(premise) }],
-      tools: [
-        {
-          name: "generate_timeline",
-          description:
-            "Generate the alternative history timeline with all events, connections, and real history counterparts",
-          input_schema: jsonSchema,
-        },
-      ],
-      tool_choice: { type: "tool", name: "generate_timeline" },
     }),
   });
 
@@ -70,8 +86,6 @@ async function handleAnthropicStreaming(
     throw new Error(`Anthropic API ${response.status}: ${errBody}`);
   }
 
-  // Stream the tool_use JSON parts back to the client as plain text.
-  // This keeps the connection alive and avoids Netlify timeout.
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
 
@@ -97,7 +111,6 @@ async function handleAnthropicStreaming(
             try {
               const event = JSON.parse(payload);
 
-              // Check for API errors in the stream
               if (event.type === "error") {
                 controller.enqueue(
                   encoder.encode(`__ERROR__${JSON.stringify(event.error)}`)
@@ -106,17 +119,15 @@ async function handleAnthropicStreaming(
                 return;
               }
 
-              // Collect tool_use input JSON deltas
+              // Text deltas from the response
               if (
                 event.type === "content_block_delta" &&
-                event.delta?.type === "input_json_delta"
+                event.delta?.type === "text_delta"
               ) {
-                controller.enqueue(
-                  encoder.encode(event.delta.partial_json)
-                );
+                controller.enqueue(encoder.encode(event.delta.text));
               }
             } catch {
-              // Skip unparseable SSE lines
+              // Skip unparseable lines
             }
           }
         }
