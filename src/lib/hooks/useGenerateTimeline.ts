@@ -75,10 +75,27 @@ export function useGenerateTimeline() {
           signal: controller.signal,
         });
 
-        const data = await response.json() as PartialTimeline;
+        if (!response.ok) {
+          const errData = await response.json().catch(() => null);
+          throw new Error(errData?.error || `HTTP ${response.status}`);
+        }
 
-        if (!response.ok || data.error) {
-          throw new Error(data.error || `HTTP ${response.status}`);
+        // Handle streamed plain text (Anthropic) vs JSON (OpenAI)
+        const contentType = response.headers.get("content-type") || "";
+        let data: PartialTimeline;
+
+        if (contentType.includes("text/plain")) {
+          const text = await response.text();
+          if (text.includes("__ERROR__")) {
+            throw new Error(text.split("__ERROR__").pop() || "Stream error");
+          }
+          data = JSON.parse(text) as PartialTimeline;
+        } else {
+          data = (await response.json()) as PartialTimeline;
+        }
+
+        if (data.error) {
+          throw new Error(data.error);
         }
 
         updateCurrentTimeline({

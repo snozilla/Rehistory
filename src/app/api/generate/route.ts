@@ -4,7 +4,6 @@ import { generatedTimelineSchema } from "@/lib/ai/schema";
 import { getSystemPrompt, getUserPrompt } from "@/lib/ai/prompts";
 
 export const runtime = "edge";
-export const maxDuration = 60;
 
 export async function POST(req: Request) {
   const { premise, provider, apiKey: rawKey, model } = await req.json();
@@ -19,7 +18,7 @@ export async function POST(req: Request) {
 
   try {
     if (provider === "anthropic") {
-      return await handleAnthropic(premise, apiKey, model);
+      return await handleAnthropicStreaming(premise, apiKey, model);
     } else {
       return await handleOpenAI(premise, apiKey, model);
     }
@@ -33,9 +32,12 @@ export async function POST(req: Request) {
   }
 }
 
-async function handleAnthropic(premise: string, apiKey: string, model?: string) {
+async function handleAnthropicStreaming(
+  premise: string,
+  apiKey: string,
+  model?: string
+) {
   const fullSchema = generatedTimelineSchema.toJSONSchema();
-  // Strip $schema key - Anthropic doesn't want it
   const { $schema, ...jsonSchema } = fullSchema as Record<string, unknown>;
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -48,12 +50,14 @@ async function handleAnthropic(premise: string, apiKey: string, model?: string) 
     body: JSON.stringify({
       model: model || "claude-sonnet-4-5-20250929",
       max_tokens: 16000,
+      stream: true,
       system: getSystemPrompt(),
       messages: [{ role: "user", content: getUserPrompt(premise) }],
       tools: [
         {
           name: "generate_timeline",
-          description: "Generate the alternative history timeline with all events, connections, and real history counterparts",
+          description:
+            "Generate the alternative history timeline with all events, connections, and real history counterparts",
           input_schema: jsonSchema,
         },
       ],
@@ -66,16 +70,71 @@ async function handleAnthropic(premise: string, apiKey: string, model?: string) 
     throw new Error(`Anthropic API ${response.status}: ${errBody}`);
   }
 
-  const data = await response.json();
-  const toolUse = data.content?.find(
-    (block: { type: string }) => block.type === "tool_use"
-  );
+  // Stream the tool_use JSON parts back to the client as plain text.
+  // This keeps the connection alive and avoids Netlify timeout.
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
 
-  if (!toolUse?.input) {
-    throw new Error("No structured output returned from Anthropic");
-  }
+  const stream = new ReadableStream({
+    async start(controller) {
+      const reader = response.body!.getReader();
+      let buffer = "";
 
-  return Response.json(toolUse.input);
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() || "";
+
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            const payload = line.slice(6).trim();
+            if (payload === "[DONE]") continue;
+
+            try {
+              const event = JSON.parse(payload);
+
+              // Check for API errors in the stream
+              if (event.type === "error") {
+                controller.enqueue(
+                  encoder.encode(`__ERROR__${JSON.stringify(event.error)}`)
+                );
+                controller.close();
+                return;
+              }
+
+              // Collect tool_use input JSON deltas
+              if (
+                event.type === "content_block_delta" &&
+                event.delta?.type === "input_json_delta"
+              ) {
+                controller.enqueue(
+                  encoder.encode(event.delta.partial_json)
+                );
+              }
+            } catch {
+              // Skip unparseable SSE lines
+            }
+          }
+        }
+      } catch (err) {
+        controller.enqueue(
+          encoder.encode(
+            `__ERROR__${err instanceof Error ? err.message : "Stream failed"}`
+          )
+        );
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: { "content-type": "text/plain; charset=utf-8" },
+  });
 }
 
 async function handleOpenAI(premise: string, apiKey: string, model?: string) {
