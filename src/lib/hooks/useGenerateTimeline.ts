@@ -76,11 +76,12 @@ export function useGenerateTimeline() {
 
         if (!response.ok) {
           const text = await response.text();
-          throw new Error(text || `HTTP ${response.status}`);
+          throw new Error(`HTTP ${response.status}: ${text.slice(0, 200)}`);
         }
 
+        const contentType = response.headers.get("content-type") ?? "";
         const reader = response.body?.getReader();
-        if (!reader) throw new Error("No response body");
+        if (!reader) throw new Error(`No response body (status=${response.status}, type=${contentType})`);
 
         const decoder = new TextDecoder();
         let fullText = "";
@@ -110,11 +111,11 @@ export function useGenerateTimeline() {
         // Check if we got an error or empty response
         const trimmed = fullText.trim();
         if (!trimmed) {
-          throw new Error("Empty response — the AI provider may have rejected the request. Check your API key and try again.");
+          throw new Error(`Empty response from server (status=${response.status}, type=${contentType}). Check API key & provider settings.`);
         }
-        // Detect error JSON or plain text errors
+        // Detect error JSON, plain text errors, or HTML error pages
         if (trimmed.startsWith("{\"error") || trimmed.startsWith("Error") || trimmed.startsWith("<!")) {
-          throw new Error(trimmed.slice(0, 200));
+          throw new Error(`Server error: ${trimmed.slice(0, 300)}`);
         }
 
         // Final parse
