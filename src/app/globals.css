@@ -1,26 +1,93 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #09090b;
+  --foreground: #fafafa;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Timeline spine */
+.timeline-spine {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(245, 158, 11, 0.3) 10%,
+    rgba(245, 158, 11, 0.3) 90%,
+    transparent
+  );
+  transform: translateX(-50%);
+}
+
+/* Pulse animation for generating state */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* React Flow customization */
+.react-flow__background {
+  background: var(--background) !important;
+}
+
+.react-flow__minimap {
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 0.75rem !important;
+  overflow: hidden;
+  background: rgba(9, 9, 11, 0.8) !important;
+}
+
+.react-flow__controls {
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 0.75rem !important;
+  overflow: hidden;
+  background: rgba(9, 9, 11, 0.8) !important;
+}
+
+.react-flow__controls-button {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.react-flow__controls-button:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: white !important;
 }
