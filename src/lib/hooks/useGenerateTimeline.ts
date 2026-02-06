@@ -107,14 +107,14 @@ export function useGenerateTimeline() {
           }
         }
 
-        // Check if we got an error response
+        // Check if we got an error or empty response
         const trimmed = fullText.trim();
-        if (trimmed.includes("__ERROR__:")) {
-          const errorMsg = trimmed.split("__ERROR__:").pop() ?? "AI provider error";
-          throw new Error(errorMsg);
+        if (!trimmed) {
+          throw new Error("Empty response — the AI provider may have rejected the request. Check your API key and try again.");
         }
-        if (!trimmed || trimmed.startsWith("Error") || trimmed.startsWith("{\"error")) {
-          throw new Error(trimmed || "No response from AI provider");
+        // Detect error JSON or plain text errors
+        if (trimmed.startsWith("{\"error") || trimmed.startsWith("Error") || trimmed.startsWith("<!")) {
+          throw new Error(trimmed.slice(0, 200));
         }
 
         // Final parse

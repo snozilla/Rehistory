@@ -7,13 +7,13 @@ import { getSystemPrompt, getUserPrompt } from "@/lib/ai/prompts";
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
+  const { premise, provider, apiKey, model } = await req.json();
+
+  if (!premise || !apiKey) {
+    return new Response("Missing premise or API key", { status: 400 });
+  }
+
   try {
-    const { premise, provider, apiKey, model } = await req.json();
-
-    if (!premise || !apiKey) {
-      return new Response("Missing premise or API key", { status: 400 });
-    }
-
     let aiModel;
     if (provider === "anthropic") {
       const anthropic = createAnthropic({ apiKey });
@@ -30,32 +30,16 @@ export async function POST(req: Request) {
       prompt: getUserPrompt(premise),
     });
 
-    // Consume the stream manually so we can catch errors and forward them
-    const reader = result.textStream;
-    const encoder = new TextEncoder();
+    // Consume the full object in the background to catch async errors
+    result.object.catch(() => {});
 
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          for await (const chunk of reader) {
-            controller.enqueue(encoder.encode(chunk));
-          }
-          controller.close();
-        } catch (error: unknown) {
-          const msg = error instanceof Error ? error.message : "AI provider error";
-          // Send error as a recognizable prefix so the client can detect it
-          controller.enqueue(encoder.encode(`__ERROR__:${msg}`));
-          controller.close();
-        }
-      },
-    });
-
-    return new Response(stream, {
-      headers: { "Content-Type": "text/plain; charset=utf-8" },
-    });
+    return result.toTextStreamResponse();
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : "Unknown error occurred";
-    return new Response(message, { status: 500 });
+    return new Response(JSON.stringify({ error: message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
