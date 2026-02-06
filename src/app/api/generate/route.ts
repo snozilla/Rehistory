@@ -4,6 +4,7 @@ import { createAnthropic } from "@ai-sdk/anthropic";
 import { generatedTimelineSchema } from "@/lib/ai/schema";
 import { getSystemPrompt, getUserPrompt } from "@/lib/ai/prompts";
 
+export const runtime = "edge";
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
