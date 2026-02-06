@@ -7,7 +7,8 @@ import { getSystemPrompt, getUserPrompt } from "@/lib/ai/prompts";
 export const runtime = "edge";
 
 export async function POST(req: Request) {
-  const { premise, provider, apiKey, model } = await req.json();
+  const { premise, provider, apiKey: rawKey, model } = await req.json();
+  const apiKey = typeof rawKey === "string" ? rawKey.trim() : "";
 
   if (!premise || !apiKey) {
     return Response.json({ error: "Missing premise or API key" }, { status: 400 });
@@ -34,6 +35,9 @@ export async function POST(req: Request) {
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : "Unknown error occurred";
-    return Response.json({ error: message }, { status: 500 });
+    return Response.json(
+      { error: `[${provider}/${model}] ${message}` },
+      { status: 500 }
+    );
   }
 }
