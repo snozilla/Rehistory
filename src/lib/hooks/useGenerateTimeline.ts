@@ -38,11 +38,12 @@ function repairJson(text: string): string {
     JSON.parse(text);
     return text;
   } catch {
-    // Remove any trailing incomplete string value
+    // Remove trailing incomplete key-value pairs or strings
     let fixed = text.replace(/,\s*"[^"]*$/, "");
     fixed = fixed.replace(/,\s*$/, "");
+    // Remove trailing incomplete object inside an array
+    fixed = fixed.replace(/,\s*\{[^}]*$/, "");
 
-    // Count unclosed braces and brackets
     let braces = 0;
     let brackets = 0;
     let inString = false;
@@ -58,12 +59,48 @@ function repairJson(text: string): string {
       if (ch === "]") brackets--;
     }
 
-    // Close open structures
     while (brackets > 0) { fixed += "]"; brackets--; }
     while (braces > 0) { fixed += "}"; braces--; }
 
     return fixed;
   }
+}
+
+function cleanStreamText(text: string): string {
+  let cleaned = text.trim();
+  if (cleaned.startsWith("```")) {
+    cleaned = cleaned.replace(/^```(?:json)?\s*/, "").replace(/\s*```$/, "");
+  }
+  return cleaned;
+}
+
+function tryParseTimeline(text: string): PartialTimeline | null {
+  try {
+    const cleaned = cleanStreamText(text);
+    if (!cleaned.startsWith("{")) return null;
+    return JSON.parse(repairJson(cleaned)) as PartialTimeline;
+  } catch {
+    return null;
+  }
+}
+
+function applyTimeline(
+  data: PartialTimeline,
+  updateCurrentTimeline: (t: {
+    divergenceYear: number;
+    divergenceDescription: string;
+    events: TimelineEvent[];
+    connections: EventConnection[];
+    realHistoryEvents: TimelineEvent[];
+  }) => void
+) {
+  updateCurrentTimeline({
+    divergenceYear: Number(data.divergenceYear) || 0,
+    divergenceDescription: String(data.divergenceDescription ?? ""),
+    events: (data.events ?? []).filter(isValidEvent),
+    connections: (data.connections ?? []).filter(isValidConnection),
+    realHistoryEvents: (data.realHistoryEvents ?? []).filter(isValidEvent),
+  });
 }
 
 export function useGenerateTimeline() {
@@ -114,36 +151,56 @@ export function useGenerateTimeline() {
           throw new Error(errData?.error || `HTTP ${response.status}`);
         }
 
-        // Handle streamed plain text (Anthropic) vs JSON (OpenAI)
         const contentType = response.headers.get("content-type") || "";
-        let data: PartialTimeline;
 
-        if (contentType.includes("text/plain")) {
-          const text = await response.text();
-          if (text.includes("__ERROR__")) {
-            throw new Error(text.split("__ERROR__").pop() || "Stream error");
+        if (contentType.includes("text/plain") && response.body) {
+          // Stream in progressively
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let accumulated = "";
+          let lastEventCount = 0;
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            accumulated += decoder.decode(value, { stream: true });
+
+            // Check for error markers
+            if (accumulated.includes("__ERROR__")) {
+              throw new Error(
+                accumulated.split("__ERROR__").pop() || "Stream error"
+              );
+            }
+
+            // Try to parse partial JSON and update UI
+            const partial = tryParseTimeline(accumulated);
+            if (partial) {
+              const validEvents = (partial.events ?? []).filter(isValidEvent);
+              // Only update if we have new events to show
+              if (
+                validEvents.length > lastEventCount ||
+                (lastEventCount === 0 && partial.divergenceYear)
+              ) {
+                lastEventCount = validEvents.length;
+                applyTimeline(partial, updateCurrentTimeline);
+              }
+            }
           }
-          // Strip markdown fencing if present
-          let cleaned = text.trim();
-          if (cleaned.startsWith("```")) {
-            cleaned = cleaned.replace(/^```(?:json)?\s*/, "").replace(/\s*```$/, "");
+
+          // Final parse with complete text
+          const final = tryParseTimeline(accumulated);
+          if (final) {
+            applyTimeline(final, updateCurrentTimeline);
+          } else {
+            throw new Error("Failed to parse AI response");
           }
-          data = JSON.parse(repairJson(cleaned)) as PartialTimeline;
         } else {
-          data = (await response.json()) as PartialTimeline;
+          // JSON response (OpenAI)
+          const data = (await response.json()) as PartialTimeline;
+          if (data.error) throw new Error(data.error);
+          applyTimeline(data, updateCurrentTimeline);
         }
-
-        if (data.error) {
-          throw new Error(data.error);
-        }
-
-        updateCurrentTimeline({
-          divergenceYear: Number(data.divergenceYear) || 0,
-          divergenceDescription: String(data.divergenceDescription ?? ""),
-          events: (data.events ?? []).filter(isValidEvent),
-          connections: (data.connections ?? []).filter(isValidConnection),
-          realHistoryEvents: (data.realHistoryEvents ?? []).filter(isValidEvent),
-        });
 
         finishGeneration();
       } catch (err: unknown) {
@@ -153,7 +210,16 @@ export function useGenerateTimeline() {
         setIsLoading(false);
       }
     },
-    [provider, getActiveKey, getActiveModel, startGeneration, updateCurrentTimeline, finishGeneration, setError, router]
+    [
+      provider,
+      getActiveKey,
+      getActiveModel,
+      startGeneration,
+      updateCurrentTimeline,
+      finishGeneration,
+      setError,
+      router,
+    ]
   );
 
   return { generate, isLoading };
