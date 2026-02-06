@@ -9,9 +9,10 @@ Your timelines should:
 - Span from the divergence point to approximately the present day (2025)
 - Include real-world counterparts where relevant for comparison
 - Have unique IDs for each event (use format: evt_1, evt_2, etc.)
-- Include 15-25 alternative history events
-- Include 10-15 real history comparison events covering the same time period
+- Include 8-12 alternative history events
+- Include 5-8 real history comparison events covering the same time period
 - Create meaningful connections showing causal chains between events
+- Keep event descriptions concise (1-2 sentences each)
 
 For real history events, use the same ID format (real_1, real_2, etc.) and provide events that actually happened in our timeline, covering the same time period as the alternative events. These should help users understand how the alternative timeline differs from reality.`;
 }

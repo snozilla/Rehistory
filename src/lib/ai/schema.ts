@@ -46,7 +46,7 @@ export const generatedTimelineSchema = z.object({
   events: z
     .array(timelineEventSchema)
     .describe(
-      "15-25 alternative history events from the divergence point to present day"
+      "8-12 alternative history events from the divergence point to present day"
     ),
   connections: z
     .array(eventConnectionSchema)
@@ -54,7 +54,7 @@ export const generatedTimelineSchema = z.object({
   realHistoryEvents: z
     .array(timelineEventSchema)
     .describe(
-      "10-15 corresponding real history events for comparison, covering the same time period"
+      "5-8 corresponding real history events for comparison, covering the same time period"
     ),
 });
 
