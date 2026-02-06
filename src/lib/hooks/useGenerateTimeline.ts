@@ -12,6 +12,7 @@ interface PartialTimeline {
   events?: Partial<TimelineEvent>[];
   connections?: Partial<EventConnection>[];
   realHistoryEvents?: Partial<TimelineEvent>[];
+  error?: string;
 }
 
 function isValidEvent(e: unknown): e is TimelineEvent {
@@ -74,63 +75,19 @@ export function useGenerateTimeline() {
           signal: controller.signal,
         });
 
-        if (!response.ok) {
-          const text = await response.text();
-          throw new Error(`HTTP ${response.status}: ${text.slice(0, 200)}`);
+        const data = await response.json() as PartialTimeline;
+
+        if (!response.ok || data.error) {
+          throw new Error(data.error || `HTTP ${response.status}`);
         }
 
-        const contentType = response.headers.get("content-type") ?? "";
-        const reader = response.body?.getReader();
-        if (!reader) throw new Error(`No response body (status=${response.status}, type=${contentType})`);
-
-        const decoder = new TextDecoder();
-        let fullText = "";
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          fullText += decoder.decode(value, { stream: true });
-
-          try {
-            const parsed = tryParsePartialJson(fullText) as PartialTimeline | null;
-            if (parsed) {
-              updateCurrentTimeline({
-                divergenceYear: Number(parsed.divergenceYear) || 0,
-                divergenceDescription: String(parsed.divergenceDescription ?? ""),
-                events: (parsed.events ?? []).filter(isValidEvent),
-                connections: (parsed.connections ?? []).filter(isValidConnection),
-                realHistoryEvents: (parsed.realHistoryEvents ?? []).filter(isValidEvent),
-              });
-            }
-          } catch {
-            // Partial JSON not yet parseable
-          }
-        }
-
-        // Check if we got an error or empty response
-        const trimmed = fullText.trim();
-        if (!trimmed) {
-          throw new Error(`Empty response from server (status=${response.status}, type=${contentType}). Check API key & provider settings.`);
-        }
-        // Detect error JSON, plain text errors, or HTML error pages
-        if (trimmed.startsWith("{\"error") || trimmed.startsWith("Error") || trimmed.startsWith("<!")) {
-          throw new Error(`Server error: ${trimmed.slice(0, 300)}`);
-        }
-
-        // Final parse
-        try {
-          const final = JSON.parse(trimmed) as PartialTimeline;
-          updateCurrentTimeline({
-            divergenceYear: Number(final.divergenceYear) || 0,
-            divergenceDescription: String(final.divergenceDescription ?? ""),
-            events: (final.events ?? []).filter(isValidEvent),
-            connections: (final.connections ?? []).filter(isValidConnection),
-            realHistoryEvents: (final.realHistoryEvents ?? []).filter(isValidEvent),
-          });
-        } catch {
-          // Use whatever we have
-        }
+        updateCurrentTimeline({
+          divergenceYear: Number(data.divergenceYear) || 0,
+          divergenceDescription: String(data.divergenceDescription ?? ""),
+          events: (data.events ?? []).filter(isValidEvent),
+          connections: (data.connections ?? []).filter(isValidConnection),
+          realHistoryEvents: (data.realHistoryEvents ?? []).filter(isValidEvent),
+        });
 
         finishGeneration();
       } catch (err: unknown) {
@@ -144,40 +101,4 @@ export function useGenerateTimeline() {
   );
 
   return { generate, isLoading };
-}
-
-function tryParsePartialJson(text: string): Record<string, unknown> | null {
-  const trimmed = text.trim();
-  if (!trimmed) return null;
-
-  try {
-    return JSON.parse(trimmed);
-  } catch {
-    // Continue with fixup
-  }
-
-  let fixed = trimmed;
-  const opens: string[] = [];
-  let inString = false;
-  let escaped = false;
-
-  for (const char of fixed) {
-    if (escaped) { escaped = false; continue; }
-    if (char === "\\") { escaped = true; continue; }
-    if (char === '"') { inString = !inString; continue; }
-    if (inString) continue;
-    if (char === "{") opens.push("}");
-    else if (char === "[") opens.push("]");
-    else if (char === "}" || char === "]") opens.pop();
-  }
-
-  if (inString) fixed += '"';
-  fixed = fixed.replace(/,\s*$/, "");
-  while (opens.length > 0) fixed += opens.pop();
-
-  try {
-    return JSON.parse(fixed);
-  } catch {
-    return null;
-  }
 }
