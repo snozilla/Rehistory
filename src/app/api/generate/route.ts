@@ -2,7 +2,6 @@ import { generateObject } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generatedTimelineSchema } from "@/lib/ai/schema";
 import { getSystemPrompt, getUserPrompt } from "@/lib/ai/prompts";
-import { zodToJsonSchema } from "zod-to-json-schema";
 
 export async function POST(req: Request) {
   const { premise, provider, apiKey: rawKey, model } = await req.json();
@@ -32,10 +31,9 @@ export async function POST(req: Request) {
 }
 
 async function handleAnthropic(premise: string, apiKey: string, model?: string) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const jsonSchema = zodToJsonSchema(generatedTimelineSchema as any, {
-    $refStrategy: "none",
-  });
+  const fullSchema = generatedTimelineSchema.toJSONSchema();
+  // Strip $schema key - Anthropic doesn't want it
+  const { $schema, ...jsonSchema } = fullSchema as Record<string, unknown>;
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
