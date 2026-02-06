@@ -4,7 +4,7 @@ import { createAnthropic } from "@ai-sdk/anthropic";
 import { generatedTimelineSchema } from "@/lib/ai/schema";
 import { getSystemPrompt, getUserPrompt } from "@/lib/ai/prompts";
 
-export const maxDuration = 120;
+export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
@@ -30,7 +30,29 @@ export async function POST(req: Request) {
       prompt: getUserPrompt(premise),
     });
 
-    return result.toTextStreamResponse();
+    // Consume the stream manually so we can catch errors and forward them
+    const reader = result.textStream;
+    const encoder = new TextEncoder();
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of reader) {
+            controller.enqueue(encoder.encode(chunk));
+          }
+          controller.close();
+        } catch (error: unknown) {
+          const msg = error instanceof Error ? error.message : "AI provider error";
+          // Send error as a recognizable prefix so the client can detect it
+          controller.enqueue(encoder.encode(`__ERROR__:${msg}`));
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : "Unknown error occurred";

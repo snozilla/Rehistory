@@ -107,8 +107,12 @@ export function useGenerateTimeline() {
           }
         }
 
-        // Check if we got an error response (non-JSON or error JSON)
+        // Check if we got an error response
         const trimmed = fullText.trim();
+        if (trimmed.includes("__ERROR__:")) {
+          const errorMsg = trimmed.split("__ERROR__:").pop() ?? "AI provider error";
+          throw new Error(errorMsg);
+        }
         if (!trimmed || trimmed.startsWith("Error") || trimmed.startsWith("{\"error")) {
           throw new Error(trimmed || "No response from AI provider");
         }
