@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 async function handleAnthropic(premise: string, apiKey: string, model?: string) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const jsonSchema = zodToJsonSchema(generatedTimelineSchema as any, {
-    target: "openApi3",
+    $refStrategy: "none",
   });
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
