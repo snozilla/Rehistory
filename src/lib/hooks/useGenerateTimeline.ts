@@ -32,6 +32,40 @@ function isValidConnection(c: unknown): c is EventConnection {
   return typeof obj.sourceId === "string" && typeof obj.targetId === "string";
 }
 
+/** Try to repair truncated JSON by closing open braces/brackets */
+function repairJson(text: string): string {
+  try {
+    JSON.parse(text);
+    return text;
+  } catch {
+    // Remove any trailing incomplete string value
+    let fixed = text.replace(/,\s*"[^"]*$/, "");
+    fixed = fixed.replace(/,\s*$/, "");
+
+    // Count unclosed braces and brackets
+    let braces = 0;
+    let brackets = 0;
+    let inString = false;
+    let escaped = false;
+    for (const ch of fixed) {
+      if (escaped) { escaped = false; continue; }
+      if (ch === "\\") { escaped = true; continue; }
+      if (ch === '"') { inString = !inString; continue; }
+      if (inString) continue;
+      if (ch === "{") braces++;
+      if (ch === "}") braces--;
+      if (ch === "[") brackets++;
+      if (ch === "]") brackets--;
+    }
+
+    // Close open structures
+    while (brackets > 0) { fixed += "]"; brackets--; }
+    while (braces > 0) { fixed += "}"; braces--; }
+
+    return fixed;
+  }
+}
+
 export function useGenerateTimeline() {
   const router = useRouter();
   const startGeneration = useTimelineStore((s) => s.startGeneration);
@@ -89,7 +123,7 @@ export function useGenerateTimeline() {
           if (text.includes("__ERROR__")) {
             throw new Error(text.split("__ERROR__").pop() || "Stream error");
           }
-          data = JSON.parse(text) as PartialTimeline;
+          data = JSON.parse(repairJson(text)) as PartialTimeline;
         } else {
           data = (await response.json()) as PartialTimeline;
         }

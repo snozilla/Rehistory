@@ -49,7 +49,7 @@ async function handleAnthropicStreaming(
     },
     body: JSON.stringify({
       model: model || "claude-sonnet-4-5-20250929",
-      max_tokens: 16000,
+      max_tokens: 8192,
       stream: true,
       system: getSystemPrompt(),
       messages: [{ role: "user", content: getUserPrompt(premise) }],
