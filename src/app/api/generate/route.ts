@@ -4,8 +4,6 @@ import { createAnthropic } from "@ai-sdk/anthropic";
 import { generatedTimelineSchema } from "@/lib/ai/schema";
 import { getSystemPrompt, getUserPrompt } from "@/lib/ai/prompts";
 
-export const runtime = "edge";
-
 export async function POST(req: Request) {
   const { premise, provider, apiKey: rawKey, model } = await req.json();
   const apiKey = typeof rawKey === "string" ? rawKey.trim() : "";
@@ -35,8 +33,9 @@ export async function POST(req: Request) {
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : "Unknown error occurred";
+    const keyHint = apiKey ? `${apiKey.slice(0, 7)}...len=${apiKey.length}` : "empty";
     return Response.json(
-      { error: `[${provider}/${model}] ${message}` },
+      { error: `[${provider}/${model} key=${keyHint}] ${message}` },
       { status: 500 }
     );
   }
