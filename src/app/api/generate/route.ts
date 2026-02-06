@@ -3,6 +3,9 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generatedTimelineSchema } from "@/lib/ai/schema";
 import { getSystemPrompt, getUserPrompt } from "@/lib/ai/prompts";
 
+export const runtime = "edge";
+export const maxDuration = 60;
+
 export async function POST(req: Request) {
   const { premise, provider, apiKey: rawKey, model } = await req.json();
   const apiKey = typeof rawKey === "string" ? rawKey.trim() : "";
