@@ -58,7 +58,7 @@ IMPORTANT: Respond ONLY with valid JSON matching this exact structure (no markdo
   ]
 }
 
-Be concise. Keep descriptions to 1 sentence. Generate exactly 8 alt events, 5 real events, and 8 connections.`;
+Keep descriptions to 1-2 sentences. Generate exactly 20 alt events, 12 real events, and 15 connections.`;
 
 async function handleAnthropicStreaming(
   premise: string,
