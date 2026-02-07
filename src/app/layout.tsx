@@ -33,7 +33,7 @@ export default function RootLayout({
         <Header />
         <Sidebar />
         <main className="mx-auto max-w-7xl px-4">{children}</main>
-        <footer className="text-center py-4 text-[10px] text-zinc-400 dark:text-zinc-700">v0.17</footer>
+        <footer className="text-center py-4 text-[10px] text-zinc-400 dark:text-zinc-700">v0.18</footer>
       </body>
     </html>
   );

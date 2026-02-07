@@ -8,11 +8,13 @@ interface SettingsState {
   anthropicKey: string;
   openaiModel: string;
   anthropicModel: string;
+  eventCount: number;
   setProvider: (provider: AIProvider) => void;
   setOpenaiKey: (key: string) => void;
   setAnthropicKey: (key: string) => void;
   setOpenaiModel: (model: string) => void;
   setAnthropicModel: (model: string) => void;
+  setEventCount: (count: number) => void;
   getActiveKey: () => string;
   getActiveModel: () => string;
 }
@@ -25,11 +27,13 @@ export const useSettingsStore = create<SettingsState>()(
       anthropicKey: "",
       openaiModel: "gpt-4o",
       anthropicModel: "claude-sonnet-4-5-20250929",
+      eventCount: 20,
       setProvider: (provider) => set({ provider }),
       setOpenaiKey: (openaiKey) => set({ openaiKey }),
       setAnthropicKey: (anthropicKey) => set({ anthropicKey }),
       setOpenaiModel: (openaiModel) => set({ openaiModel }),
       setAnthropicModel: (anthropicModel) => set({ anthropicModel }),
+      setEventCount: (eventCount) => set({ eventCount }),
       getActiveKey: () => {
         const state = get();
         return state.provider === "openai" ? state.openaiKey : state.anthropicKey;

@@ -6,8 +6,11 @@ import { getSystemPrompt, getUserPrompt } from "@/lib/ai/prompts";
 export const runtime = "edge";
 
 export async function POST(req: Request) {
-  const { premise, provider, apiKey: rawKey, model } = await req.json();
+  const { premise, provider, apiKey: rawKey, model, eventCount: rawCount } = await req.json();
   const apiKey = typeof rawKey === "string" ? rawKey.trim() : "";
+  const eventCount = Math.min(Math.max(Number(rawCount) || 20, 5), 50);
+  const realCount = Math.max(Math.round(eventCount * 0.6), 3);
+  const connectionCount = Math.max(Math.round(eventCount * 0.75), 5);
 
   if (!premise || !apiKey) {
     return Response.json(
@@ -17,10 +20,11 @@ export async function POST(req: Request) {
   }
 
   try {
+    const systemPrompt = buildJsonSystem(eventCount, realCount, connectionCount);
     if (provider === "anthropic") {
-      return await handleAnthropicStreaming(premise, apiKey, model);
+      return await handleAnthropicStreaming(premise, apiKey, model, systemPrompt);
     } else {
-      return await handleOpenAI(premise, apiKey, model);
+      return await handleOpenAI(premise, apiKey, model, systemPrompt);
     }
   } catch (error: unknown) {
     const message =
@@ -32,7 +36,8 @@ export async function POST(req: Request) {
   }
 }
 
-const JSON_SYSTEM = `${getSystemPrompt()}
+function buildJsonSystem(eventCount: number, realCount: number, connectionCount: number) {
+  return `${getSystemPrompt()}
 
 IMPORTANT: Respond ONLY with valid JSON matching this exact structure (no markdown, no explanation):
 {
@@ -58,12 +63,14 @@ IMPORTANT: Respond ONLY with valid JSON matching this exact structure (no markdo
   ]
 }
 
-Keep descriptions to 1-2 sentences. Generate exactly 20 alt events, 12 real events, and 15 connections.`;
+Keep descriptions to 1-2 sentences. Generate exactly ${eventCount} alt events, ${realCount} real events, and ${connectionCount} connections.`;
+}
 
 async function handleAnthropicStreaming(
   premise: string,
   apiKey: string,
-  model?: string
+  model: string | undefined,
+  systemPrompt: string
 ) {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -76,7 +83,7 @@ async function handleAnthropicStreaming(
       model: model || "claude-sonnet-4-5-20250929",
       max_tokens: 8192,
       stream: true,
-      system: JSON_SYSTEM,
+      system: systemPrompt,
       messages: [{ role: "user", content: getUserPrompt(premise) }],
     }),
   });
@@ -148,14 +155,14 @@ async function handleAnthropicStreaming(
   });
 }
 
-async function handleOpenAI(premise: string, apiKey: string, model?: string) {
+async function handleOpenAI(premise: string, apiKey: string, model: string | undefined, systemPrompt: string) {
   const openai = createOpenAI({ apiKey });
   const aiModel = openai(model || "gpt-4o");
 
   const { object } = await generateObject({
     model: aiModel,
     schema: generatedTimelineSchema,
-    system: getSystemPrompt(),
+    system: systemPrompt,
     prompt: getUserPrompt(premise),
   });
 

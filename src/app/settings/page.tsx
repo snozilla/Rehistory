@@ -172,6 +172,34 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
+      {/* Timeline Size */}
+      <Card>
+        <CardHeader>
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">Timeline Size</h2>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Number of alternative history events to generate ({store.eventCount})
+          </p>
+          <input
+            type="range"
+            min={5}
+            max={50}
+            step={5}
+            value={store.eventCount}
+            onChange={(e) => store.setEventCount(Number(e.target.value))}
+            className="w-full accent-amber-500"
+          />
+          <div className="flex justify-between text-xs text-zinc-400 dark:text-zinc-500">
+            <span>5</span>
+            <span>15</span>
+            <span>25</span>
+            <span>35</span>
+            <span>50</span>
+          </div>
+        </CardContent>
+      </Card>
+
       <Button onClick={handleSave} className="w-full">
         {saved ? (
           <>

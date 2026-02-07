@@ -113,6 +113,7 @@ export function useGenerateTimeline() {
   const provider = useSettingsStore((s) => s.provider);
   const getActiveKey = useSettingsStore((s) => s.getActiveKey);
   const getActiveModel = useSettingsStore((s) => s.getActiveModel);
+  const eventCount = useSettingsStore((s) => s.eventCount);
 
   const [isLoading, setIsLoading] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
@@ -142,6 +143,7 @@ export function useGenerateTimeline() {
             provider,
             apiKey,
             model: getActiveModel(),
+            eventCount,
           }),
           signal: controller.signal,
         });
@@ -212,6 +214,7 @@ export function useGenerateTimeline() {
     },
     [
       provider,
+      eventCount,
       getActiveKey,
       getActiveModel,
       startGeneration,
