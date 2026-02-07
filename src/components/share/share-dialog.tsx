@@ -29,14 +29,14 @@ export function ShareDialog({ open, onClose }: ShareDialogProps) {
   return (
     <Dialog open={open} onClose={onClose} title="Share Timeline">
       <div className="space-y-4">
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
           {method === "url"
             ? "Share this URL to let others view your timeline:"
             : "The timeline is too large for a URL. It has been saved locally. Share this link (works on this device only):"}
         </p>
 
         <div className="flex items-center gap-2">
-          <div className="flex-1 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-xs text-zinc-300 font-mono truncate">
+          <div className="flex-1 rounded-lg border border-zinc-200 dark:border-white/[0.08] bg-zinc-50 dark:bg-white/[0.03] px-3 py-2 text-xs text-zinc-600 dark:text-zinc-300 font-mono truncate">
             {url}
           </div>
           <Button onClick={handleCopy} size="sm" variant="secondary">
@@ -46,8 +46,8 @@ export function ShareDialog({ open, onClose }: ShareDialogProps) {
 
         {method === "localStorage" && (
           <div className="flex items-start gap-2 rounded-lg bg-amber-500/5 border border-amber-500/20 p-3">
-            <Link2 size={14} className="text-amber-400 mt-0.5 shrink-0" />
-            <p className="text-xs text-amber-400/80">
+            <Link2 size={14} className="text-amber-500 dark:text-amber-400 mt-0.5 shrink-0" />
+            <p className="text-xs text-amber-600/80 dark:text-amber-400/80">
               For cross-device sharing, try a shorter premise or fewer events.
             </p>
           </div>

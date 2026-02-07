@@ -14,8 +14,8 @@ export function TimelineView() {
   if (!timeline) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <p className="text-zinc-500">No timeline generated yet</p>
-        <p className="text-xs text-zinc-600 mt-1">
+        <p className="text-zinc-400 dark:text-zinc-500">No timeline generated yet</p>
+        <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-1">
           Go to the home page and enter a premise
         </p>
       </div>
@@ -45,10 +45,10 @@ export function TimelineView() {
           className="text-center mb-12"
         >
           <div className="inline-flex flex-col items-center gap-2 rounded-2xl border border-amber-500/20 bg-amber-500/5 px-6 py-4">
-            <span className="text-xs text-amber-400 uppercase tracking-wider font-medium">
+            <span className="text-xs text-amber-600 dark:text-amber-400 uppercase tracking-wider font-medium">
               Point of Divergence &mdash; {timeline.divergenceYear}
             </span>
-            <p className="text-sm text-zinc-300 max-w-md">
+            <p className="text-sm text-zinc-600 dark:text-zinc-300 max-w-md">
               {timeline.divergenceDescription}
             </p>
           </div>
@@ -73,7 +73,7 @@ export function TimelineView() {
                   animate={{ opacity: 1 }}
                   className="flex justify-center mb-4"
                 >
-                  <span className="bg-zinc-950 px-4 py-1 text-[10px] text-zinc-500 uppercase tracking-widest font-medium relative z-10">
+                  <span className="bg-white dark:bg-zinc-950 px-4 py-1 text-[10px] text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-medium relative z-10">
                     {era}
                   </span>
                 </motion.div>
@@ -93,7 +93,7 @@ export function TimelineView() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="flex items-center justify-center gap-2 py-8 text-amber-400"
+          className="flex items-center justify-center gap-2 py-8 text-amber-500 dark:text-amber-400"
         >
           <Loader2 size={16} className="animate-spin" />
           <span className="text-sm">Generating events...</span>

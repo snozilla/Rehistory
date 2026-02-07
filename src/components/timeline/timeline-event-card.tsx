@@ -48,8 +48,8 @@ export function TimelineEventCard({
           side === "left" ? "right-0 translate-x-full" : "left-0 -translate-x-full"
         } h-[2px] w-8 bg-gradient-to-r ${
           side === "left"
-            ? "from-white/10 to-amber-500/30"
-            : "from-amber-500/30 to-white/10"
+            ? "from-zinc-200 dark:from-white/10 to-amber-500/30"
+            : "from-amber-500/30 to-zinc-200 dark:to-white/10"
         }`}
       />
 
@@ -57,24 +57,24 @@ export function TimelineEventCard({
       <div
         className={`absolute top-[18px] ${
           side === "left" ? "-right-[2.35rem]" : "-left-[2.35rem]"
-        } h-3 w-3 rounded-full border-2 border-zinc-950 ${colors.dot} shadow-[0_0_8px_rgba(245,158,11,0.3)]`}
+        } h-3 w-3 rounded-full border-2 border-white dark:border-zinc-950 ${colors.dot} shadow-[0_0_8px_rgba(245,158,11,0.3)]`}
       />
 
       {/* Card */}
       <div
-        className={`rounded-xl border ${colors.border} ${colors.bg} p-4 cursor-pointer transition-all hover:bg-white/[0.06]`}
+        className={`rounded-xl border ${colors.border} ${colors.bg} p-4 cursor-pointer transition-all hover:bg-zinc-100 dark:hover:bg-white/[0.06]`}
         onClick={() => setExpanded(!expanded)}
       >
         {/* Year + Category */}
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-mono text-zinc-500">{event.year}</span>
+          <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500">{event.year}</span>
           <Badge className={`${colors.bg} ${colors.text}`}>
             {event.category}
           </Badge>
         </div>
 
         {/* Title */}
-        <h3 className="text-sm font-semibold text-white mb-1">{event.title}</h3>
+        <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-1">{event.title}</h3>
 
         {/* Significance dots */}
         <div className="flex items-center gap-1 mb-2">
@@ -82,11 +82,11 @@ export function TimelineEventCard({
             <div
               key={i}
               className={`h-1.5 w-1.5 rounded-full ${
-                i < event.significance ? colors.dot : "bg-white/10"
+                i < event.significance ? colors.dot : "bg-zinc-200 dark:bg-white/10"
               }`}
             />
           ))}
-          <span className="text-[10px] text-zinc-600 ml-1">impact</span>
+          <span className="text-[10px] text-zinc-400 dark:text-zinc-600 ml-1">impact</span>
         </div>
 
         {/* Description (expandable) */}
@@ -95,15 +95,15 @@ export function TimelineEventCard({
           animate={{ height: expanded ? "auto" : 0 }}
           className="overflow-hidden"
         >
-          <p className="text-xs text-zinc-400 leading-relaxed pt-2 border-t border-white/[0.06]">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed pt-2 border-t border-zinc-200 dark:border-white/[0.06]">
             {event.description}
           </p>
           {event.realWorldCounterpart && (
-            <div className="mt-2 rounded-lg bg-white/[0.03] px-3 py-2">
-              <span className="text-[10px] text-zinc-500 uppercase tracking-wider">
+            <div className="mt-2 rounded-lg bg-zinc-100 dark:bg-white/[0.03] px-3 py-2">
+              <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
                 In our timeline
               </span>
-              <p className="text-xs text-zinc-400 mt-0.5">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                 {event.realWorldCounterpart}
               </p>
             </div>
@@ -111,7 +111,7 @@ export function TimelineEventCard({
         </motion.div>
 
         {/* Expand indicator */}
-        <div className="flex justify-center mt-2 text-zinc-600">
+        <div className="flex justify-center mt-2 text-zinc-400 dark:text-zinc-600">
           {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </div>
       </div>

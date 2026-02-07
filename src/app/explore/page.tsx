@@ -39,9 +39,9 @@ export default function ExplorePage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-white">Explore Timeline</h1>
+          <h1 className="text-xl font-bold text-zinc-900 dark:text-white">Explore Timeline</h1>
           {timeline && (
-            <p className="text-sm text-zinc-400 mt-0.5 max-w-lg truncate">
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5 max-w-lg truncate">
               {timeline.premise}
             </p>
           )}
@@ -49,13 +49,13 @@ export default function ExplorePage() {
 
         <div className="flex items-center gap-2">
           {/* View toggle */}
-          <div className="flex rounded-lg border border-white/[0.06] bg-white/[0.02] p-0.5">
+          <div className="flex rounded-lg border border-zinc-200 dark:border-white/[0.06] bg-zinc-50 dark:bg-white/[0.02] p-0.5">
             <button
               onClick={() => setExploreView("timeline")}
               className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all cursor-pointer ${
                 exploreView === "timeline"
-                  ? "bg-white/10 text-white"
-                  : "text-zinc-500 hover:text-zinc-300"
+                  ? "bg-zinc-200 dark:bg-white/10 text-zinc-900 dark:text-white"
+                  : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
               }`}
             >
               <LayoutList size={14} />
@@ -65,8 +65,8 @@ export default function ExplorePage() {
               onClick={() => setExploreView("graph")}
               className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all cursor-pointer ${
                 exploreView === "graph"
-                  ? "bg-white/10 text-white"
-                  : "text-zinc-500 hover:text-zinc-300"
+                  ? "bg-zinc-200 dark:bg-white/10 text-zinc-900 dark:text-white"
+                  : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
               }`}
             >
               <GitBranch size={14} />
@@ -104,8 +104,8 @@ export default function ExplorePage() {
         <div className="flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3">
           <AlertCircle size={18} className="text-red-400 mt-0.5 shrink-0" />
           <div>
-            <p className="text-sm text-red-200">Generation failed</p>
-            <p className="text-xs text-red-400/70 mt-0.5">{error}</p>
+            <p className="text-sm text-red-600 dark:text-red-200">Generation failed</p>
+            <p className="text-xs text-red-500/70 dark:text-red-400/70 mt-0.5">{error}</p>
           </div>
         </div>
       )}

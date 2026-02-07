@@ -39,8 +39,8 @@ export function BranchingGraphView() {
   if (!timeline) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <p className="text-zinc-500">No timeline generated yet</p>
-        <p className="text-xs text-zinc-600 mt-1">
+        <p className="text-zinc-400 dark:text-zinc-500">No timeline generated yet</p>
+        <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-1">
           Go to the home page and enter a premise
         </p>
       </div>
@@ -50,13 +50,13 @@ export function BranchingGraphView() {
   if (nodes.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <p className="text-zinc-500">Waiting for events...</p>
+        <p className="text-zinc-400 dark:text-zinc-500">Waiting for events...</p>
       </div>
     );
   }
 
   return (
-    <div className="h-[calc(100vh-12rem)] rounded-xl border border-white/[0.06] overflow-hidden">
+    <div className="h-[calc(100vh-12rem)] rounded-xl border border-zinc-200 dark:border-white/[0.06] overflow-hidden">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -70,10 +70,10 @@ export function BranchingGraphView() {
         maxZoom={2}
         proOptions={{ hideAttribution: true }}
       >
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="rgba(255,255,255,0.03)" />
+        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="rgba(0,0,0,0.05)" />
         <MiniMap
           nodeColor="rgba(245, 158, 11, 0.3)"
-          maskColor="rgba(0,0,0,0.7)"
+          maskColor="rgba(0,0,0,0.1)"
           pannable
           zoomable
         />

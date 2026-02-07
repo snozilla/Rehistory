@@ -46,7 +46,7 @@ function CustomEdgeComponent({
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
               pointerEvents: "all",
             }}
-            className="rounded-full bg-zinc-900/90 border border-white/[0.06] px-2 py-0.5 text-[9px] text-zinc-400 whitespace-nowrap"
+            className="rounded-full bg-white/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-white/[0.06] px-2 py-0.5 text-[9px] text-zinc-500 dark:text-zinc-400 whitespace-nowrap"
           >
             {data.relationship}
           </div>

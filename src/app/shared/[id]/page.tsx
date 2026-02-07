@@ -47,7 +47,7 @@ function SharedContent() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <Loader2 size={24} className="animate-spin text-amber-400" />
+        <Loader2 size={24} className="animate-spin text-amber-500 dark:text-amber-400" />
       </div>
     );
   }
@@ -55,7 +55,7 @@ function SharedContent() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-24 space-y-4">
-        <p className="text-zinc-400">{error}</p>
+        <p className="text-zinc-500 dark:text-zinc-400">{error}</p>
         <Link href="/">
           <Button variant="secondary" size="sm">
             <ArrowLeft size={14} />
@@ -76,8 +76,8 @@ function SharedContent() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-xl font-bold text-white">Shared Timeline</h1>
-          <p className="text-sm text-zinc-400 mt-0.5">
+          <h1 className="text-xl font-bold text-zinc-900 dark:text-white">Shared Timeline</h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
             Viewing a shared alternative history
           </p>
         </div>
@@ -93,7 +93,7 @@ export default function SharedPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center py-24">
-          <Loader2 size={24} className="animate-spin text-amber-400" />
+          <Loader2 size={24} className="animate-spin text-amber-500 dark:text-amber-400" />
         </div>
       }
     >

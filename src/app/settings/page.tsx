@@ -27,7 +27,7 @@ export default function SettingsPage() {
   if (!mounted) {
     return (
       <div className="py-16 max-w-xl mx-auto">
-        <div className="h-8 w-48 bg-white/5 rounded animate-pulse" />
+        <div className="h-8 w-48 bg-zinc-100 dark:bg-white/5 rounded animate-pulse" />
       </div>
     );
   }
@@ -40,8 +40,8 @@ export default function SettingsPage() {
   return (
     <div className="py-16 max-w-xl mx-auto space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-white">Settings</h1>
-        <p className="text-sm text-zinc-400 mt-1">
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Settings</h1>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
           Configure your AI provider and API keys
         </p>
       </div>
@@ -49,7 +49,7 @@ export default function SettingsPage() {
       {/* Provider Selection */}
       <Card>
         <CardHeader>
-          <h2 className="text-sm font-semibold text-white">AI Provider</h2>
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">AI Provider</h2>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-3">
@@ -60,24 +60,24 @@ export default function SettingsPage() {
                 className={`rounded-lg border px-4 py-3 text-left transition-all cursor-pointer ${
                   store.provider === p
                     ? "border-amber-500/40 bg-amber-500/10"
-                    : "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04]"
+                    : "border-zinc-200 dark:border-white/[0.06] bg-zinc-50 dark:bg-white/[0.02] hover:bg-zinc-100 dark:hover:bg-white/[0.04]"
                 }`}
               >
                 <div className="flex items-center gap-2">
                   <div
                     className={`h-2 w-2 rounded-full ${
-                      store.provider === p ? "bg-amber-400" : "bg-zinc-600"
+                      store.provider === p ? "bg-amber-400" : "bg-zinc-300 dark:bg-zinc-600"
                     }`}
                   />
                   <span
                     className={`text-sm font-medium ${
-                      store.provider === p ? "text-white" : "text-zinc-400"
+                      store.provider === p ? "text-zinc-900 dark:text-white" : "text-zinc-500 dark:text-zinc-400"
                     }`}
                   >
                     {p === "openai" ? "OpenAI" : "Anthropic"}
                   </span>
                 </div>
-                <p className="text-xs text-zinc-500 mt-1 ml-4">
+                <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 ml-4">
                   {p === "openai" ? "GPT-4o, GPT-4 Turbo" : "Claude Sonnet, Haiku, Opus"}
                 </p>
               </button>
@@ -89,37 +89,37 @@ export default function SettingsPage() {
       {/* OpenAI Config */}
       <Card>
         <CardHeader>
-          <h2 className="text-sm font-semibold text-white">OpenAI Configuration</h2>
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">OpenAI Configuration</h2>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="block text-xs text-zinc-400 mb-1.5">API Key</label>
+            <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1.5">API Key</label>
             <div className="relative">
               <input
                 type={showOpenAI ? "text" : "password"}
                 value={store.openaiKey}
                 onChange={(e) => store.setOpenaiKey(e.target.value)}
                 placeholder="sk-..."
-                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 pr-10 text-sm text-white placeholder:text-zinc-600 focus:border-amber-500/30 focus:outline-none"
+                className="w-full rounded-lg border border-zinc-200 dark:border-white/[0.08] bg-zinc-50 dark:bg-white/[0.03] px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:border-amber-500/30 focus:outline-none"
               />
               <button
                 type="button"
                 onClick={() => setShowOpenAI(!showOpenAI)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 cursor-pointer"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 cursor-pointer"
               >
                 {showOpenAI ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
           <div>
-            <label className="block text-xs text-zinc-400 mb-1.5">Model</label>
+            <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1.5">Model</label>
             <select
               value={store.openaiModel}
               onChange={(e) => store.setOpenaiModel(e.target.value)}
-              className="w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-white focus:border-amber-500/30 focus:outline-none"
+              className="w-full rounded-lg border border-zinc-200 dark:border-white/[0.08] bg-zinc-50 dark:bg-white/[0.03] px-3 py-2 text-sm text-zinc-900 dark:text-white focus:border-amber-500/30 focus:outline-none"
             >
               {OPENAI_MODELS.map((m) => (
-                <option key={m} value={m} className="bg-zinc-900">
+                <option key={m} value={m} className="bg-white dark:bg-zinc-900">
                   {m}
                 </option>
               ))}
@@ -131,39 +131,39 @@ export default function SettingsPage() {
       {/* Anthropic Config */}
       <Card>
         <CardHeader>
-          <h2 className="text-sm font-semibold text-white">
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">
             Anthropic Configuration
           </h2>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="block text-xs text-zinc-400 mb-1.5">API Key</label>
+            <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1.5">API Key</label>
             <div className="relative">
               <input
                 type={showAnthropic ? "text" : "password"}
                 value={store.anthropicKey}
                 onChange={(e) => store.setAnthropicKey(e.target.value)}
                 placeholder="sk-ant-..."
-                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 pr-10 text-sm text-white placeholder:text-zinc-600 focus:border-amber-500/30 focus:outline-none"
+                className="w-full rounded-lg border border-zinc-200 dark:border-white/[0.08] bg-zinc-50 dark:bg-white/[0.03] px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:border-amber-500/30 focus:outline-none"
               />
               <button
                 type="button"
                 onClick={() => setShowAnthropic(!showAnthropic)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 cursor-pointer"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 cursor-pointer"
               >
                 {showAnthropic ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
           <div>
-            <label className="block text-xs text-zinc-400 mb-1.5">Model</label>
+            <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1.5">Model</label>
             <select
               value={store.anthropicModel}
               onChange={(e) => store.setAnthropicModel(e.target.value)}
-              className="w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-white focus:border-amber-500/30 focus:outline-none"
+              className="w-full rounded-lg border border-zinc-200 dark:border-white/[0.08] bg-zinc-50 dark:bg-white/[0.03] px-3 py-2 text-sm text-zinc-900 dark:text-white focus:border-amber-500/30 focus:outline-none"
             >
               {ANTHROPIC_MODELS.map((m) => (
-                <option key={m} value={m} className="bg-zinc-900">
+                <option key={m} value={m} className="bg-white dark:bg-zinc-900">
                   {m}
                 </option>
               ))}

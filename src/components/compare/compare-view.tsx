@@ -72,8 +72,8 @@ export function CompareView() {
   if (!timeline) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <p className="text-zinc-500">No timeline to compare</p>
-        <p className="text-xs text-zinc-600 mt-1">
+        <p className="text-zinc-400 dark:text-zinc-500">No timeline to compare</p>
+        <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-1">
           Generate a timeline first to see the comparison
         </p>
       </div>
@@ -84,12 +84,12 @@ export function CompareView() {
     <div className="space-y-4">
       {/* Controls */}
       <div className="flex items-center gap-3">
-        <label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer">
+        <label className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 cursor-pointer">
           <input
             type="checkbox"
             checked={syncScroll}
             onChange={(e) => setSyncScroll(e.target.checked)}
-            className="rounded border-white/10 bg-white/5 text-amber-500 focus:ring-amber-500/30"
+            className="rounded border-zinc-300 dark:border-white/10 bg-zinc-100 dark:bg-white/5 text-amber-500 focus:ring-amber-500/30"
           />
           Sync scroll
         </label>
@@ -99,12 +99,12 @@ export function CompareView() {
       <div className="grid grid-cols-2 gap-4">
         {/* Alt History */}
         <div>
-          <div className="sticky top-0 z-10 bg-zinc-950/90 backdrop-blur-sm pb-3 mb-4">
-            <h3 className="text-sm font-semibold text-amber-400 flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-amber-400" />
+          <div className="sticky top-0 z-10 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-sm pb-3 mb-4">
+            <h3 className="text-sm font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-amber-500 dark:bg-amber-400" />
               Alternative Timeline
             </h3>
-            <p className="text-xs text-zinc-500 mt-0.5 truncate">
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5 truncate">
               {timeline.premise}
             </p>
           </div>
@@ -115,7 +115,7 @@ export function CompareView() {
             {buckets.map((bucket, i) => (
               <div key={`alt-${bucket.year}`}>
                 {/* Year marker */}
-                <div className="text-xs font-mono text-zinc-600 mb-2">
+                <div className="text-xs font-mono text-zinc-400 dark:text-zinc-600 mb-2">
                   {bucket.year}
                 </div>
                 {bucket.altEvents.length > 0 ? (
@@ -123,7 +123,7 @@ export function CompareView() {
                     <CompareEventCard key={event.id} event={event} variant="alt" index={i} />
                   ))
                 ) : (
-                  <div className="h-16 rounded-lg border border-dashed border-white/[0.04] flex items-center justify-center text-[10px] text-zinc-700">
+                  <div className="h-16 rounded-lg border border-dashed border-zinc-200 dark:border-white/[0.04] flex items-center justify-center text-[10px] text-zinc-400 dark:text-zinc-700">
                     No divergent event
                   </div>
                 )}
@@ -134,12 +134,12 @@ export function CompareView() {
 
         {/* Real History */}
         <div>
-          <div className="sticky top-0 z-10 bg-zinc-950/90 backdrop-blur-sm pb-3 mb-4">
-            <h3 className="text-sm font-semibold text-blue-400 flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-blue-400" />
+          <div className="sticky top-0 z-10 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-sm pb-3 mb-4">
+            <h3 className="text-sm font-semibold text-blue-500 dark:text-blue-400 flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-blue-500 dark:bg-blue-400" />
               Real History
             </h3>
-            <p className="text-xs text-zinc-500 mt-0.5">
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
               What actually happened
             </p>
           </div>
@@ -149,7 +149,7 @@ export function CompareView() {
           >
             {buckets.map((bucket, i) => (
               <div key={`real-${bucket.year}`}>
-                <div className="text-xs font-mono text-zinc-600 mb-2">
+                <div className="text-xs font-mono text-zinc-400 dark:text-zinc-600 mb-2">
                   {bucket.year}
                 </div>
                 {bucket.realEvents.length > 0 ? (
@@ -157,7 +157,7 @@ export function CompareView() {
                     <CompareEventCard key={event.id} event={event} variant="real" index={i} />
                   ))
                 ) : (
-                  <div className="h-16 rounded-lg border border-dashed border-white/[0.04] flex items-center justify-center text-[10px] text-zinc-700">
+                  <div className="h-16 rounded-lg border border-dashed border-zinc-200 dark:border-white/[0.04] flex items-center justify-center text-[10px] text-zinc-400 dark:text-zinc-700">
                     No corresponding event
                   </div>
                 )}
@@ -197,7 +197,7 @@ function CompareEventCard({
           className={
             variant === "alt"
               ? `${colors.bg} ${colors.text}`
-              : "bg-blue-500/15 text-blue-400"
+              : "bg-blue-500/15 text-blue-500 dark:text-blue-400"
           }
         >
           {event.category}
@@ -210,15 +210,15 @@ function CompareEventCard({
                 i < event.significance
                   ? variant === "alt"
                     ? colors.dot
-                    : "bg-blue-400"
-                  : "bg-white/10"
+                    : "bg-blue-500 dark:bg-blue-400"
+                  : "bg-zinc-200 dark:bg-white/10"
               }`}
             />
           ))}
         </div>
       </div>
-      <h4 className="text-xs font-semibold text-white">{event.title}</h4>
-      <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed line-clamp-3">
+      <h4 className="text-xs font-semibold text-zinc-900 dark:text-white">{event.title}</h4>
+      <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed line-clamp-3">
         {event.description}
       </p>
     </motion.div>

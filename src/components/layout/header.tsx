@@ -17,14 +17,14 @@ export function Header() {
   const sidebarOpen = useUIStore((s) => s.sidebarOpen);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-zinc-950/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-zinc-200 dark:border-white/[0.06] bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2 group">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-600 shadow-lg shadow-amber-900/30">
               <GitBranch size={16} className="text-white" />
             </div>
-            <span className="text-lg font-bold text-white tracking-tight">
+            <span className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
               Re<span className="text-amber-500">history</span>
             </span>
           </Link>
@@ -36,8 +36,8 @@ export function Header() {
                 href={link.href}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   pathname === link.href
-                    ? "bg-white/10 text-white"
-                    : "text-zinc-400 hover:text-white hover:bg-white/5"
+                    ? "bg-zinc-200 dark:bg-white/10 text-zinc-900 dark:text-white"
+                    : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5"
                 }`}
               >
                 {link.label}
@@ -49,7 +49,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="relative p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+            className="relative p-2 rounded-lg text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
             title="Saved Timelines"
           >
             <BookmarkCheck size={18} />
@@ -58,14 +58,14 @@ export function Header() {
             href="/settings"
             className={`p-2 rounded-lg transition-colors ${
               pathname === "/settings"
-                ? "bg-white/10 text-white"
-                : "text-zinc-400 hover:text-white hover:bg-white/5"
+                ? "bg-zinc-200 dark:bg-white/10 text-zinc-900 dark:text-white"
+                : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5"
             }`}
           >
             <Settings size={18} />
           </Link>
           <button
-            className="md:hidden p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+            className="md:hidden p-2 rounded-lg text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
             <Menu size={18} />

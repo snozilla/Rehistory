@@ -30,12 +30,12 @@ export function Dialog({ open, onClose, title, children }: DialogProps) {
       onClose={onClose}
       className="backdrop:bg-black/60 bg-transparent p-0 m-auto"
     >
-      <div className="bg-zinc-900 border border-white/10 rounded-2xl w-[90vw] max-w-lg shadow-2xl">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
-          <h2 className="text-lg font-semibold text-white">{title}</h2>
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl w-[90vw] max-w-lg shadow-2xl">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-200 dark:border-white/[0.06]">
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">{title}</h2>
           <button
             onClick={onClose}
-            className="text-zinc-400 hover:text-white transition-colors cursor-pointer"
+            className="text-zinc-400 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-colors cursor-pointer"
           >
             <X size={18} />
           </button>

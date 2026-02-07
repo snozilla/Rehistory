@@ -28,13 +28,13 @@ function EventNodeComponent({ data, id }: NodeProps<EventNodeType>) {
       />
 
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[10px] font-mono text-zinc-500">{event.year}</span>
+        <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500">{event.year}</span>
         <span className={`text-[10px] font-medium ${colors.text}`}>
           {event.category}
         </span>
       </div>
 
-      <h4 className="text-xs font-semibold text-white leading-snug">
+      <h4 className="text-xs font-semibold text-zinc-900 dark:text-white leading-snug">
         {event.title}
       </h4>
 
@@ -44,14 +44,14 @@ function EventNodeComponent({ data, id }: NodeProps<EventNodeType>) {
           <div
             key={i}
             className={`h-1 w-1 rounded-full ${
-              i < event.significance ? colors.dot : "bg-white/10"
+              i < event.significance ? colors.dot : "bg-zinc-200 dark:bg-white/10"
             }`}
           />
         ))}
       </div>
 
       {expanded && (
-        <p className="text-[11px] text-zinc-400 leading-relaxed mt-2 pt-2 border-t border-white/[0.06]">
+        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed mt-2 pt-2 border-t border-zinc-200 dark:border-white/[0.06]">
           {event.description}
         </p>
       )}
