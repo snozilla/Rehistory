@@ -27,6 +27,7 @@ export default function ExplorePage() {
   const saveTimeline = useTimelineStore((s) => s.saveTimeline);
   const [shareOpen, setShareOpen] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
+  const [showFullPremise, setShowFullPremise] = useState(false);
 
   const handleSave = () => {
     saveTimeline();
@@ -41,7 +42,10 @@ export default function ExplorePage() {
         <div>
           <h1 className="text-xl font-bold text-zinc-900 dark:text-white">Explore Timeline</h1>
           {timeline && (
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5 max-w-lg truncate">
+            <p
+              onClick={() => setShowFullPremise(!showFullPremise)}
+              className={`text-sm text-zinc-500 dark:text-zinc-400 mt-0.5 max-w-lg cursor-pointer hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors ${showFullPremise ? "" : "truncate"}`}
+            >
               {timeline.premise}
             </p>
           )}
