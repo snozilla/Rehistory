@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
+import { FontSizeProvider } from "@/components/layout/font-size-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,10 +31,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 min-h-screen`}
       >
+        <FontSizeProvider />
         <Header />
         <Sidebar />
         <main className="mx-auto max-w-7xl px-4">{children}</main>
-        <footer className="text-center py-4 text-[10px] text-zinc-400 dark:text-zinc-700">v0.18</footer>
+        <footer className="text-center py-4 text-[10px] text-zinc-400 dark:text-zinc-700">v0.19</footer>
       </body>
     </html>
   );

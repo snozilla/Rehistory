@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Eye, EyeOff, Check } from "lucide-react";
+import { Eye, EyeOff, Check, Minus, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useSettingsStore } from "@/lib/store/settings-store";
@@ -168,6 +168,37 @@ export default function SettingsPage() {
                 </option>
               ))}
             </select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Font Size */}
+      <Card>
+        <CardHeader>
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">Font Size</h2>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => store.setFontSize(store.fontSize - 2)}
+              disabled={store.fontSize <= 12}
+              className="rounded-lg border border-zinc-200 dark:border-white/[0.06] bg-zinc-50 dark:bg-white/[0.02] p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.04] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+            >
+              <Minus size={16} />
+            </button>
+            <div className="flex-1 text-center">
+              <span className="text-lg font-medium text-zinc-900 dark:text-white">{store.fontSize}px</span>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
+                {store.fontSize === 16 ? "Default" : store.fontSize < 16 ? "Smaller" : "Larger"}
+              </p>
+            </div>
+            <button
+              onClick={() => store.setFontSize(store.fontSize + 2)}
+              disabled={store.fontSize >= 24}
+              className="rounded-lg border border-zinc-200 dark:border-white/[0.06] bg-zinc-50 dark:bg-white/[0.02] p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.04] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+            >
+              <Plus size={16} />
+            </button>
           </div>
         </CardContent>
       </Card>
