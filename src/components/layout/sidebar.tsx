@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { X, Trash2, Clock } from "lucide-react";
 import { useUIStore } from "@/lib/store/ui-store";
 import { useTimelineStore } from "@/lib/store/timeline-store";
@@ -8,6 +9,7 @@ import { Button } from "@/components/ui/button";
 export function Sidebar() {
   const sidebarOpen = useUIStore((s) => s.sidebarOpen);
   const setSidebarOpen = useUIStore((s) => s.setSidebarOpen);
+  const router = useRouter();
   const savedTimelines = useTimelineStore((s) => s.savedTimelines);
   const loadTimeline = useTimelineStore((s) => s.loadTimeline);
   const deleteSavedTimeline = useTimelineStore((s) => s.deleteSavedTimeline);
@@ -50,6 +52,7 @@ export function Sidebar() {
                   onClick={() => {
                     loadTimeline(saved.id);
                     setSidebarOpen(false);
+                    router.push("/explore");
                   }}
                   className="w-full text-left cursor-pointer"
                 >
