@@ -5,21 +5,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-:root {
-  --background: #ffffff;
-  --foreground: #18181b;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #09090b;
-    --foreground: #fafafa;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
 }
 
@@ -92,7 +78,13 @@ body {
 
 /* React Flow customization */
 .react-flow__background {
-  background: var(--background) !important;
+  background: #ffffff !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .react-flow__background {
+    background: #09090b !important;
+  }
 }
 
 .react-flow__minimap {
