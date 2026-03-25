@@ -19,6 +19,26 @@ export const metadata: Metadata = {
   title: "ReHi — Alternative History Explorer",
   description:
     "Explore alternative history timelines with AI-generated cascading consequences",
+  openGraph: {
+    title: "ReHi — Alternative History Explorer",
+    description:
+      "Explore alternative history timelines with AI-generated cascading consequences",
+    images: [
+      {
+        url: "/Rehistory/og-image.webp",
+        width: 1200,
+        height: 630,
+        type: "image/webp",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ReHi — Alternative History Explorer",
+    description:
+      "Explore alternative history timelines with AI-generated cascading consequences",
+    images: ["/Rehistory/og-image.webp"],
+  },
 };
 
 export default function RootLayout({
