@@ -19,6 +19,14 @@ export const metadata: Metadata = {
   title: "ReHi — Alternative History Explorer",
   description:
     "Explore alternative history timelines with AI-generated cascading consequences",
+  icons: {
+    icon: [
+      { url: "/Rehistory/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/Rehistory/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/Rehistory/apple-touch-icon.png",
+  },
+  manifest: "/Rehistory/site.webmanifest",
   openGraph: {
     title: "ReHi — Alternative History Explorer",
     description:
