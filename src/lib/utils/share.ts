@@ -23,8 +23,8 @@ export function createShareUrl(timeline: GeneratedTimeline): {
   method: "url" | "localStorage";
 } {
   const compressed = compressTimeline(timeline);
-  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-  const url = `${baseUrl}/shared/${timeline.id}?data=${compressed}`;
+  const baseUrl = typeof window !== "undefined" ? window.location.origin + (window.location.pathname.startsWith("/Rehistory") ? "/Rehistory" : "") : "";
+  const url = `${baseUrl}/shared?id=${timeline.id}&data=${compressed}`;
 
   if (url.length > MAX_URL_LENGTH) {
     // Store in localStorage and share by ID only
@@ -32,7 +32,7 @@ export function createShareUrl(timeline: GeneratedTimeline): {
       localStorage.setItem(`rehi-shared-${timeline.id}`, JSON.stringify(timeline));
     }
     return {
-      url: `${baseUrl}/shared/${timeline.id}`,
+      url: `${baseUrl}/shared?id=${timeline.id}`,
       method: "localStorage",
     };
   }

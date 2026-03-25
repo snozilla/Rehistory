@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTimelineStore } from "@/lib/store/timeline-store";
 import { useSettingsStore } from "@/lib/store/settings-store";
+import { generateStream } from "@/lib/ai/client-generate";
 import type { TimelineEvent, EventConnection } from "@/types/timeline";
 
 interface PartialTimeline {
@@ -135,51 +136,19 @@ export function useGenerateTimeline() {
       router.push("/explore");
 
       try {
-        const response = await fetch("/api/generate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            premise,
-            provider,
-            apiKey,
-            model: getActiveModel(),
-            eventCount,
-          }),
+        let lastEventCount = 0;
+
+        const finalText = await generateStream({
+          premise,
+          provider,
+          apiKey,
+          model: getActiveModel(),
+          eventCount,
           signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          const errData = await response.json().catch(() => null);
-          throw new Error(errData?.error || `HTTP ${response.status}`);
-        }
-
-        const contentType = response.headers.get("content-type") || "";
-
-        if (contentType.includes("text/plain") && response.body) {
-          // Stream in progressively
-          const reader = response.body.getReader();
-          const decoder = new TextDecoder();
-          let accumulated = "";
-          let lastEventCount = 0;
-
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            accumulated += decoder.decode(value, { stream: true });
-
-            // Check for error markers
-            if (accumulated.includes("__ERROR__")) {
-              throw new Error(
-                accumulated.split("__ERROR__").pop() || "Stream error"
-              );
-            }
-
-            // Try to parse partial JSON and update UI
+          onChunk(accumulated) {
             const partial = tryParseTimeline(accumulated);
             if (partial) {
               const validEvents = (partial.events ?? []).filter(isValidEvent);
-              // Only update if we have new events to show
               if (
                 validEvents.length > lastEventCount ||
                 (lastEventCount === 0 && partial.divergenceYear)
@@ -188,20 +157,14 @@ export function useGenerateTimeline() {
                 applyTimeline(partial, updateCurrentTimeline);
               }
             }
-          }
+          },
+        });
 
-          // Final parse with complete text
-          const final = tryParseTimeline(accumulated);
-          if (final) {
-            applyTimeline(final, updateCurrentTimeline);
-          } else {
-            throw new Error("Failed to parse AI response");
-          }
+        const final = tryParseTimeline(finalText);
+        if (final) {
+          applyTimeline(final, updateCurrentTimeline);
         } else {
-          // JSON response (OpenAI)
-          const data = (await response.json()) as PartialTimeline;
-          if (data.error) throw new Error(data.error);
-          applyTimeline(data, updateCurrentTimeline);
+          throw new Error("Failed to parse AI response");
         }
 
         finishGeneration();

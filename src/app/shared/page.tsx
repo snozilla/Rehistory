@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams, useParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -11,14 +11,13 @@ import { decompressTimeline } from "@/lib/utils/share";
 import type { GeneratedTimeline } from "@/types/timeline";
 
 function SharedContent() {
-  const params = useParams();
   const searchParams = useSearchParams();
   const setCurrentTimeline = useTimelineStore((s) => s.setCurrentTimeline);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const id = params.id as string;
+    const id = searchParams.get("id");
     const data = searchParams.get("data");
 
     if (data) {
@@ -28,7 +27,7 @@ function SharedContent() {
       } else {
         setError("Failed to decompress timeline data");
       }
-    } else {
+    } else if (id) {
       const stored = localStorage.getItem(`rehi-shared-${id}`);
       if (stored) {
         try {
@@ -40,9 +39,11 @@ function SharedContent() {
       } else {
         setError("Shared timeline not found");
       }
+    } else {
+      setError("No timeline data provided");
     }
     setLoading(false);
-  }, [params.id, searchParams, setCurrentTimeline]);
+  }, [searchParams, setCurrentTimeline]);
 
   if (loading) {
     return (
